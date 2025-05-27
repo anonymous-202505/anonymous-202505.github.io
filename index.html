@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Scientific Plots</title>
+  <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+</head>
+<body>
+  <h1>Scientific Results</h1>
+  
+  <select id="plotSelector" onchange="updatePlot()">
+    <option value="plot1">Accuracy Over Time</option>
+    <option value="plot2">Loss Comparison</option>
+  </select>
+  
+  <div id="plot"></div>
+
+  <script>
+    function updatePlot() {
+      const selected = document.getElementById('plotSelector').value;
+      if (selected === 'plot1') {
+        Plotly.newPlot('plot', [{ x: [1, 2, 3], y: [10, 15, 13] }], { title: 'Accuracy Over Time' });
+      } else if (selected === 'plot2') {
+        Plotly.newPlot('plot', [{ x: [1, 2, 3], y: [20, 14, 23] }], { title: 'Loss Comparison' });
+      }
+    }
+
+    updatePlot(); // initialize
+  </script>
+</body>
+</html>
