@@ -190,13 +190,23 @@
     [datasetSelect, visualizationSelect, modelSelect, metricSelect].forEach(el => el.addEventListener('change', renderPlots));
 
     function sanitizeModel(model) {
-      return model === 'Jina v3' ? 'JinaV3' : 'MultilingualE5Instruct';
+      return model === 'Jina v3' ? 'JinaV3Wrapper' : 'E5MultilingualWrapper';
+    }
+
+    function getMetric(metricValue) {
+      if (metricValue === 'NDCG@10') {
+        return 'ndcg_at_10';
+      } else if (metricValue === 'Recall@100') {
+        return 'recall_at_100';
+      } else {
+        return 'recall_at_1000';
+      }
     }
 
     function renderPlots() {
       const dataset = datasetSelect.value;
       const viz = visualizationSelect.value;
-      const metric = metricSelect.value;
+      const metric = getMetric(metricSelect.value);
       const selectedModels = Array.from(modelSelect.selectedOptions).map(o => o.value);
       if (selectedModels.length === 0) {
         selectedModels.push('Jina v3');
@@ -218,16 +228,16 @@
         if (viz === 'heatmaps') {
           if (dataset === 'core') {
             content += '<div class="plot-table">';
-            for (let i = 1; i <= 5; i++) {
-              const src1 = `plots/core/heatmaps/${modelDir}/${metric}/heatmap${i}.pdf`;
-              const src2 = i <= 4 ? `plots/core/heatmaps/${modelDir}/${metric}/heatmap${i+5}.pdf` : null;
-              content += `<div class="d-flex flex-column">${makePlot(src1, `Heatmap ${i}`)}${src2 ? makePlot(src2, `Heatmap ${i+5}`) : ''}</div>`;
+            for (let i = 0; i <= 4; i++) {
+              const src1 = `https://github.com/anonymous-202505/CoRECT/tree/main/resources/heatmaps/${modelDir}/${metric}/core/passage_${10000*(10**i)}.png`;
+              const src2 = i <= 3 ? `https://github.com/anonymous-202505/CoRECT/tree/main/resources/heatmaps/${modelDir}/${metric}/core/document_${10000*(10**i)}.png` : null;
+              content += `<div class="d-flex flex-column">${makePlot(src1, `Passage corpus size=${10000*(10**i)}`)}${src2 ? makePlot(src2, `Document corpus size=${10000*(10**i)}`) : ''}</div>`;
             }
             content += '</div>';
           } else if (dataset === 'beir') {
-            const batch1 = [`plots/beir/heatmaps/${modelDir}/${metric}/aggregated.pdf`];
-            const datasets = ['Arguana', 'NFCorpus', 'FiQA-2018', 'TREC-COVID', 'Webis-Touche2020', 'CQADupstack', 'Quora', 'DBPedia', 'SCIDOCS', 'FEVER', 'ClimateFEVER', 'SciFact', 'HotpotQA', 'NaturalQuestions', 'TriviaQA'];
-            const batch2 = datasets.map(name => `plots/beir/heatmaps/${modelDir}/${metric}/${name}.pdf`);
+            const batch1 = [`https://github.com/anonymous-202505/CoRECT/tree/main/resources/heatmaps/${modelDir}/${metric}/beir/aggregated.png`];
+            const datasets = ['arguana', "cqadupstack",  "dbpedia", "fiqa", "nfcorpus", "nq", "quora", "scidocs", "scifact", "touche2020", "trec-covid",];
+            const batch2 = datasets.map(name => `https://github.com/anonymous-202505/CoRECT/tree/main/resources/heatmaps/${modelDir}/${metric}/beir/${name}.png`);
             console.log(batch1, batch2);
 
             content += '<div class="d-flex justify-content-center plot-table">' + makePlot(batch1[0], 'Aggregated Heatmap') + '</div>';
@@ -235,7 +245,7 @@
           }
         } else if (viz === 'line_charts' && dataset === 'core') {
           const plots = [
-            { file: `plots/core/line_charts/${modelDir}/${metric}/core_line1.pdf`, caption: 'Line Chart 1', width: 'plot-wide-2_5x' },
+            { file: `https://github.com/anonymous-202505/CoRECT/blob/main/resources/line_charts/${modelDir}/${metric}/combined.png`, caption: 'Line Chart 1', width: 'plot-wide-2_5x' },
             { file: `plots/core/line_charts/${modelDir}/${metric}/core_line2.pdf`, caption: 'Line Chart 2', width: 'plot-wide-2x' }
           ];
           content += '<div class="plot-grid">' + plots.map(p => makePlot(p.file, p.caption, p.width)).join('') + '</div>';
